@@ -1,26 +1,249 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Brand palette — "The Nook" editorial country-club */
+  --paper: #f3ecde;
+  --paper-deep: #ece2cd;
+  --ink: #1c2620;
+  --ink-soft: #3a4a40;
+  --court: #2f4a3a;
+  --court-deep: #20342a;
+  --moss: #c2cdb2;
+  --moss-soft: #dde2cf;
+  --coral: #df7654;
+  --coral-deep: #b85a3e;
+  --line: #d6cdb8;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-paper: var(--paper);
+  --color-paper-deep: var(--paper-deep);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-court: var(--court);
+  --color-court-deep: var(--court-deep);
+  --color-moss: var(--moss);
+  --color-moss-soft: var(--moss-soft);
+  --color-coral: var(--coral);
+  --color-coral-deep: var(--coral-deep);
+  --color-line: var(--line);
+
+  --font-sans: var(--font-geist-sans), system-ui, sans-serif;
+  --font-display: var(--font-fraunces), Georgia, serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  border-color: var(--line);
+}
+
+html,
+body {
+  background: var(--paper);
+  color: var(--ink);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  font-feature-settings: "ss01", "cv11";
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
+
+/* Display headings */
+.font-display {
+  font-family: var(--font-display);
+  font-optical-sizing: auto;
+  font-variation-settings: "SOFT" 30, "WONK" 0;
+  letter-spacing: -0.025em;
+}
+
+/* Tabular numerals for time labels */
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Paper grain — very subtle SVG noise overlay */
+.paper-grain {
+  position: relative;
+  isolation: isolate;
+}
+.paper-grain::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.5;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.11  0 0 0 0 0.15  0 0 0 0 0.13  0 0 0 0.05 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  background-size: 220px 220px;
+}
+.paper-grain > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Diagonal hatch — used for booked slots */
+.hatch-court {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    var(--court) 0,
+    var(--court) 1px,
+    transparent 1px,
+    transparent 7px
+  );
+  background-color: rgba(47, 74, 58, 0.06);
+}
+
+/* Court line corner brackets (decorative tennis-court vibe) */
+.frame-marks {
+  position: relative;
+}
+.frame-marks::before,
+.frame-marks::after {
+  content: "";
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border: 1.5px solid var(--ink);
+}
+.frame-marks::before {
+  top: -1px;
+  left: -1px;
+  border-right: none;
+  border-bottom: none;
+}
+.frame-marks::after {
+  bottom: -1px;
+  right: -1px;
+  border-left: none;
+  border-top: none;
+}
+
+/* Subtle elevated card */
+.card-elev {
+  background: var(--paper);
+  box-shadow:
+    0 1px 0 0 rgba(28, 38, 32, 0.04),
+    0 8px 24px -12px rgba(32, 52, 42, 0.18),
+    0 24px 60px -28px rgba(32, 52, 42, 0.14);
+}
+
+/* Focus ring — coral, accessible */
+:where(button, a, input, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--coral);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* Selection */
+::selection {
+  background: var(--coral);
+  color: var(--paper);
+}
+
+/* Buttons — primary */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: var(--ink);
+  color: var(--paper);
+  padding: 0.875rem 1.5rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  font-size: 0.78rem;
+  border: 1px solid var(--ink);
+  transition:
+    transform 180ms cubic-bezier(0.34, 1.56, 0.64, 1),
+    background-color 150ms ease;
+}
+.btn-primary:hover {
+  background: var(--court-deep);
+  transform: translateY(-1px);
+}
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: transparent;
+  color: var(--ink);
+  padding: 0.7rem 1.1rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  border: 1px solid var(--ink);
+  transition: background-color 150ms ease, color 150ms ease;
+}
+.btn-ghost:hover {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.btn-coral {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: var(--coral);
+  color: var(--paper);
+  padding: 0.875rem 1.5rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  font-size: 0.78rem;
+  border: 1px solid var(--coral);
+  transition:
+    transform 180ms cubic-bezier(0.34, 1.56, 0.64, 1),
+    background-color 150ms ease;
+}
+.btn-coral:hover {
+  background: var(--coral-deep);
+  transform: translateY(-1px);
+}
+
+/* Slot cell — empty state */
+.slot-empty {
+  background: var(--paper);
+  transition:
+    background-color 140ms ease,
+    transform 220ms cubic-bezier(0.34, 1.56, 0.64, 1),
+    color 140ms ease;
+}
+.slot-empty:hover {
+  background: var(--moss-soft);
+  color: var(--court-deep);
+}
+.slot-empty:active {
+  transform: scale(0.98);
+}
+
+/* Marquee strip animation */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.marquee-track {
+  animation: marquee 60s linear infinite;
+}
+
+/* Modal backdrop fade-in */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes scale-in {
+  from { opacity: 0; transform: translateY(8px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.anim-fade { animation: fade-in 180ms ease; }
+.anim-pop { animation: scale-in 240ms cubic-bezier(0.34, 1.56, 0.64, 1); }

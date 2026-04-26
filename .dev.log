@@ -1,0 +1,34 @@
+
+> nookers@0.1.0 dev
+> next dev
+
+▲ Next.js 16.2.4 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://10.5.0.2:3000
+✓ Ready in 525ms
+
+ GET / 200 in 846ms (next.js: 348ms, application-code: 498ms)
+ GET / 200 in 105ms (next.js: 3ms, application-code: 102ms)
+ GET / 200 in 132ms (next.js: 3ms, application-code: 129ms)
+ POST / 200 in 93ms (next.js: 3ms, application-code: 90ms)
+  └─ ƒ createBooking({"date":"2026-04-28","durationHours":2,"email":"e2e@example.com","...":"3 items not stringified"}) in 12ms app/actions.ts
+ GET / 200 in 123ms (next.js: 3ms, application-code: 120ms)
+ POST / 200 in 77ms (next.js: 3ms, application-code: 74ms)
+  └─ ƒ createBooking({"date":"2026-04-28","durationHours":2,"email":"e2e@example.com","...":"3 items not stringified"}) in 7ms app/actions.ts
+ GET / 200 in 102ms (next.js: 3ms, application-code: 99ms)
+ GET / 200 in 113ms (next.js: 3ms, application-code: 110ms)
+✓ Compiled in 45ms
+ GET / 200 in 85ms (next.js: 4ms, application-code: 81ms)
+ GET / 200 in 335ms (next.js: 141ms, application-code: 194ms)
+✓ Compiled in 34ms
+ GET / 200 in 195ms (next.js: 108ms, application-code: 87ms)
+ GET / 200 in 240ms (next.js: 3ms, application-code: 237ms)
+ POST / 200 in 99ms (next.js: 3ms, application-code: 96ms)
+  └─ ƒ createBooking({"date":"2026-04-28","durationHours":2,"email":"e2e@example.com","...":"3 items not stringified"}) in 13ms app/actions.ts
+ GET / 200 in 139ms (next.js: 3ms, application-code: 136ms)
+ GET / 200 in 151ms (next.js: 3ms, application-code: 148ms)
+ GET / 200 in 108ms (next.js: 3ms, application-code: 105ms)
+ GET / 200 in 123ms (next.js: 3ms, application-code: 120ms)
+ POST / 200 in 90ms (next.js: 3ms, application-code: 87ms)
+  └─ ƒ createBooking({"date":"2026-04-28","durationHours":2,"email":"coral@example.com","...":"3 items not stringified"}) in 7ms app/actions.ts
+ GET / 200 in 119ms (next.js: 3ms, application-code: 116ms)

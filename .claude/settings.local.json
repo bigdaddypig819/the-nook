@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(node screenshot.mjs / db-state 1440 1400)",
+      "PowerShell($r = Invoke-WebRequest -Uri http://localhost:3000/ -UseBasicParsing; \\($r.Content -split \"`n\" | Select-String -Pattern \"Database not connected|font-mono text-xs|SQLITE|libsql|TURSO\" -Context 0,2\\))"
+    ]
+  }
+}
