@@ -19,9 +19,9 @@ const fraunces = Fraunces({
 });
 
 export const metadata: Metadata = {
-  title: "The Nook — Pickleball Court Booking",
+  title: "The NOOK — Play. Connect. Belong.",
   description:
-    "Reserve The Nook — a neighborhood pickleball court. One-hour slots, 7am to 4pm daily.",
+    "The NOOK is more than a pickleball court. A welcoming place to play good games, meet good people, and feel at home.",
 };
 
 export default function RootLayout({

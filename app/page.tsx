@@ -2,10 +2,17 @@ import { addDays, format } from "date-fns";
 import { Hero } from "@/components/Hero";
 import { Nav } from "@/components/Nav";
 import { Footer } from "@/components/Footer";
-import { CourtInfo } from "@/components/CourtInfo";
 import { WeekGrid } from "@/components/WeekGrid";
 import { WeekNav } from "@/components/WeekNav";
 import { MyBookings } from "@/components/MyBookings";
+import {
+  IntroSection,
+  EveryoneSection,
+  CommunitySection,
+  FamilySection,
+  ExpectSection,
+  ComePlaySection,
+} from "@/components/StorySections";
 import { getWeekBookedSlots } from "@/lib/bookings";
 import { parseDateISO, weekStartFor } from "@/lib/dates";
 
@@ -49,15 +56,21 @@ export default async function Home({
       <Nav />
       <main className="flex-1">
         <Hero />
+        <IntroSection />
+        <EveryoneSection />
+        <CommunitySection />
+        <FamilySection />
+        <ExpectSection />
+        <ComePlaySection />
 
         <section
           id="book"
-          className="mx-auto max-w-7xl px-6 lg:px-10 pt-20 lg:pt-28 pb-12"
+          className="mx-auto max-w-7xl px-6 lg:px-10 pt-8 pb-24"
         >
           <div className="mb-10 flex items-end justify-between gap-6 flex-wrap">
             <div className="max-w-md">
               <div className="text-[0.7rem] tracking-[0.3em] uppercase text-ink-soft">
-                The Schedule
+                Reserve your time
               </div>
               <h2 className="font-display text-5xl lg:text-6xl mt-3 leading-[0.95]">
                 Pick your <span className="italic text-court">hour</span>
@@ -113,8 +126,6 @@ export default async function Home({
             <Legend swatch="bg-moss-soft" label="Today" />
           </div>
         </section>
-
-        <CourtInfo />
       </main>
       <Footer />
     </>
