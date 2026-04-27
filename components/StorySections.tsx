@@ -95,8 +95,8 @@ export function EveryoneSection() {
                 className="aspect-[4/3] lg:aspect-auto lg:col-span-3 lg:row-span-2"
               />
               <ImageTile
-                src="/photos/17.jpg"
-                alt="Doubles team in a focused rally"
+                src="/photos/23.jpg"
+                alt="Doubles partners squaring up at the net"
                 className="aspect-[4/3] lg:aspect-auto lg:col-span-3 lg:row-span-2"
               />
             </div>
@@ -200,6 +200,20 @@ export function CommunitySection() {
             dark
           />
           <ImageTile
+            src="/photos/25.jpg"
+            alt="The crew gathered around the table after a long night of pickleball"
+            className="col-span-2 lg:col-span-8 aspect-[4/3] lg:aspect-[16/9]"
+            dark
+            caption="After the last rally"
+          />
+          <ImageTile
+            src="/photos/26.jpg"
+            alt="Members night — the whole NOOK family on court"
+            className="col-span-2 lg:col-span-4 aspect-[4/3] lg:aspect-auto"
+            dark
+            objectPosition="object-top"
+          />
+          <ImageTile
             src="/photos/13.jpg"
             alt="Players sharing a moment after a point"
             className="col-span-1 lg:col-span-4 aspect-square"
@@ -278,8 +292,8 @@ export function FamilySection() {
             </div>
             <div className="hidden lg:block absolute -bottom-6 -right-6 w-44 aspect-[3/4] overflow-hidden border border-ink/20 bg-paper shadow-[0_20px_40px_-20px_rgba(32,52,42,0.4)]">
               <Image
-                src="/photos/19.jpg"
-                alt="Players sharing a casual moment"
+                src="/photos/24.jpg"
+                alt="A NOOK regular ready at the net"
                 width={300}
                 height={400}
                 className="w-full h-full object-cover"
@@ -409,7 +423,7 @@ export function ComePlaySection() {
 
         <div className="mt-10 sm:mt-12 flex flex-wrap items-center justify-center gap-4">
           <a href="#book" className="btn-coral">
-            Book a Court
+            Book the NOOK
             <span aria-hidden>→</span>
           </a>
           <a href="#community" className="btn-ghost">
@@ -427,12 +441,16 @@ function ImageTile({
   className = "",
   tinted = false,
   dark = false,
+  caption,
+  objectPosition = "object-center",
 }: {
   src: string;
   alt: string;
   className?: string;
   tinted?: boolean;
   dark?: boolean;
+  caption?: string;
+  objectPosition?: string;
 }) {
   return (
     <div
@@ -445,13 +463,13 @@ function ImageTile({
         alt={alt}
         fill
         sizes="(max-width: 768px) 100vw, 33vw"
-        className="object-cover transition-transform duration-700 ease-out hover:scale-[1.04]"
+        className={`object-cover ${objectPosition} transition-transform duration-700 ease-out hover:scale-[1.04]`}
       />
       <div
         aria-hidden
         className={`absolute inset-0 ${
           dark
-            ? "bg-gradient-to-t from-court-deep/55 via-transparent to-transparent"
+            ? "bg-gradient-to-t from-court-deep/65 via-court-deep/10 to-transparent"
             : "bg-gradient-to-t from-ink/30 via-transparent to-transparent"
         }`}
       />
@@ -461,6 +479,13 @@ function ImageTile({
           className="absolute inset-0 mix-blend-multiply"
           style={{ background: "rgba(47,74,58,0.18)" }}
         />
+      )}
+      {caption && (
+        <div className="absolute left-4 bottom-4 right-4 text-paper">
+          <div className="text-[0.6rem] tracking-[0.32em] uppercase text-paper/75">
+            <span className="text-coral">✦</span> {caption}
+          </div>
+        </div>
       )}
     </div>
   );

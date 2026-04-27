@@ -41,7 +41,7 @@ export function Hero() {
 
           <div className="mt-8 sm:mt-10 flex flex-wrap items-center gap-3 sm:gap-4">
             <a href="#book" className="btn-coral">
-              Book a Court
+              Book the NOOK
               <span aria-hidden>→</span>
             </a>
             <a href="#community" className="btn-ghost">
@@ -107,25 +107,76 @@ export function Hero() {
         </div>
       </div>
 
-      {/* Marquee */}
-      <div className="border-y border-ink/15 py-3 overflow-hidden bg-court text-paper">
-        <div className="flex gap-12 marquee-track whitespace-nowrap text-[0.78rem] tracking-[0.3em] uppercase">
-          {Array.from({ length: 2 }).map((_, i) => (
-            <div key={i} className="flex gap-12 pl-12 shrink-0">
-              <span>Have Fun</span>
-              <span aria-hidden>✦</span>
-              <span>Respect The Game</span>
-              <span aria-hidden>✦</span>
-              <span>Support Each Other</span>
-              <span aria-hidden>✦</span>
-              <span>Keep Coming Back</span>
-              <span aria-hidden>✦</span>
-              <span>All Skill Levels Welcome</span>
-              <span aria-hidden>✦</span>
-              <span>Family Friendly</span>
-              <span aria-hidden>✦</span>
+      {/* Manifesto strip — replaces the old marquee */}
+      <div className="relative border-y border-ink/15 bg-court text-paper paper-grain overflow-hidden">
+        <div
+          aria-hidden
+          className="absolute inset-0 -z-0 opacity-60"
+          style={{
+            background:
+              "radial-gradient(60% 80% at 0% 50%, rgba(223,118,84,0.22), transparent 60%), radial-gradient(50% 80% at 100% 50%, rgba(194,205,178,0.14), transparent 60%)",
+          }}
+        />
+        <div className="relative mx-auto max-w-7xl px-6 lg:px-10 py-10 lg:py-14">
+          <div className="flex items-baseline gap-4 mb-8 lg:mb-10">
+            <span className="h-px w-10 bg-coral" />
+            <span className="text-[0.65rem] tracking-[0.32em] uppercase text-paper/65">
+              The House Rules
+            </span>
+            <span className="hidden sm:block flex-1 h-px bg-paper/15" />
+            <span className="hidden sm:block text-[0.65rem] tracking-[0.32em] uppercase text-paper/45">
+              Est. on the kitchen line
+            </span>
+          </div>
+          <ul className="grid grid-cols-2 lg:grid-cols-4 gap-x-6 sm:gap-x-10 gap-y-9 lg:gap-y-0">
+            {[
+              {
+                tag: "Have fun.",
+                note: "Loose grip. Loud laughs. The W is just a bonus.",
+              },
+              {
+                tag: "Respect the game.",
+                note: "Honor the line, the partner, and the next match.",
+              },
+              {
+                tag: "Lift each other.",
+                note: "Cheer the rally. Share the paddle. Make the call.",
+              },
+              {
+                tag: "Keep coming back.",
+                note: "Regulars become friends. Friends become family.",
+              },
+            ].map((rule, i) => (
+              <li
+                key={rule.tag}
+                className="group lg:border-l lg:border-paper/15 lg:pl-8 lg:first:border-l-0 lg:first:pl-0"
+              >
+                <div className="flex items-center gap-3">
+                  <span className="tabular text-coral text-[0.62rem] tracking-[0.32em]">
+                    No. 0{i + 1}
+                  </span>
+                  <span className="h-px flex-1 bg-paper/15 transition-colors duration-300 group-hover:bg-coral/70" />
+                </div>
+                <div className="font-display italic text-2xl sm:text-[1.7rem] lg:text-3xl mt-3 leading-[1.1] tracking-[-0.01em]">
+                  {rule.tag}
+                </div>
+                <div className="mt-3 text-[0.78rem] sm:text-sm text-paper/65 leading-[1.65] max-w-[22ch]">
+                  {rule.note}
+                </div>
+              </li>
+            ))}
+          </ul>
+          <div className="mt-9 lg:mt-12 flex items-center justify-between gap-4 pt-6 border-t border-paper/15">
+            <div className="flex items-center gap-3 text-[0.65rem] tracking-[0.3em] uppercase text-paper/55">
+              <span className="text-coral">✦</span>
+              <span>All skill levels welcome</span>
+              <span className="hidden sm:inline text-paper/30">·</span>
+              <span className="hidden sm:inline">Family friendly</span>
             </div>
-          ))}
+            <span className="hidden md:inline text-[0.6rem] tracking-[0.3em] uppercase text-paper/40">
+              Pinned to the wall, abided by all.
+            </span>
+          </div>
         </div>
       </div>
     </section>

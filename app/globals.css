@@ -227,15 +227,6 @@ body {
   transform: scale(0.98);
 }
 
-/* Marquee strip animation */
-@keyframes marquee {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
-}
-.marquee-track {
-  animation: marquee 60s linear infinite;
-}
-
 /* Modal backdrop fade-in */
 @keyframes fade-in {
   from { opacity: 0; }

@@ -57,7 +57,7 @@ export function Footer() {
               </li>
               <li>
                 <a href="#book" className="hover:text-coral transition-colors">
-                  Book a Court
+                  Book the NOOK
                 </a>
               </li>
             </ul>

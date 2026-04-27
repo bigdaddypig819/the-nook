@@ -21,14 +21,15 @@ const statements = sql
   .split(";")
   .map((s) => s.trim())
   .filter(Boolean);
+(async () => {
+  for (const stmt of statements) {
+    await client.execute(stmt);
+    console.log("✓", stmt.split("\n")[0].slice(0, 80));
+  }
 
-for (const stmt of statements) {
-  await client.execute(stmt);
-  console.log("✓", stmt.split("\n")[0].slice(0, 80));
-}
+  await applyMigrations(client);
+  console.log("✓ migrations");
 
-await applyMigrations(client);
-console.log("✓ migrations");
-
-console.log("\nSchema applied to", url);
-process.exit(0);
+  console.log("\nSchema applied to", url);
+  process.exit(0);
+})();

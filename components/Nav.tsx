@@ -36,7 +36,7 @@ export function Nav() {
             Visit
           </a>
           <a href="#book" className="btn-coral !py-2 !px-4 !text-[0.7rem]">
-            Book a Court
+            Book the NOOK
           </a>
         </nav>
         <a
