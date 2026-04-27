@@ -1,6 +1,6 @@
 export const COURT = "the-nook";
 
-export const OPEN_HOUR = 7;
+export const OPEN_HOUR = 6;
 export const CLOSE_HOUR = 16;
 
 export const SLOT_HOURS: number[] = Array.from(

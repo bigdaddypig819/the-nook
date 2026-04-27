@@ -23,7 +23,7 @@ export function CourtInfo() {
 
         <dl className="mt-10 grid grid-cols-2 gap-y-6 gap-x-8">
           {[
-            ["Hours", "7am – 4pm"],
+            ["Hours", "6am – 4pm"],
             ["Slot", "60 minutes"],
             ["Surface", "Asphalt"],
             ["Lights", "Daylight only"],
