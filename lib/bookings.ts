@@ -1,5 +1,6 @@
 import { db } from "./db";
 import { COURT } from "./slots";
+import { todayLocalISO } from "./dates";
 
 export type Booking = {
   id: string;
@@ -56,6 +57,53 @@ export async function getWeekBookedSlots(
     slot_hour: Number(r.slot_hour),
     duration_hours: Number(r.duration_hours ?? 1),
   }));
+}
+
+export type BookingScope = "upcoming" | "past" | "cancelled" | "all";
+
+export async function getAllBookings(
+  scope: BookingScope = "upcoming",
+): Promise<Booking[]> {
+  const today = todayLocalISO();
+  const client = await db();
+
+  let sql: string;
+  let args: (string | number)[];
+  switch (scope) {
+    case "upcoming":
+      sql = `SELECT * FROM bookings
+             WHERE court = ?
+               AND cancelled_at IS NULL
+               AND slot_date >= ?
+             ORDER BY slot_date ASC, slot_hour ASC`;
+      args = [COURT, today];
+      break;
+    case "past":
+      sql = `SELECT * FROM bookings
+             WHERE court = ?
+               AND cancelled_at IS NULL
+               AND slot_date < ?
+             ORDER BY slot_date DESC, slot_hour DESC`;
+      args = [COURT, today];
+      break;
+    case "cancelled":
+      sql = `SELECT * FROM bookings
+             WHERE court = ?
+               AND cancelled_at IS NOT NULL
+             ORDER BY cancelled_at DESC`;
+      args = [COURT];
+      break;
+    case "all":
+    default:
+      sql = `SELECT * FROM bookings
+             WHERE court = ?
+             ORDER BY slot_date DESC, slot_hour DESC`;
+      args = [COURT];
+      break;
+  }
+
+  const res = await client.execute({ sql, args });
+  return res.rows.map((r) => rowToBooking(r as Record<string, unknown>));
 }
 
 export async function getBookingById(id: string): Promise<Booking | null> {

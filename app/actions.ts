@@ -15,16 +15,14 @@ import {
   isSlotInPast,
   parseDateISO,
 } from "@/lib/dates";
+import { sendBookingCreated, type BookingPayload } from "@/lib/email";
 import {
-  sendBookingCancelled,
-  sendBookingCreated,
-  sendBookingRescheduled,
-  type BookingPayload,
-} from "@/lib/email";
+  cancelBookingCore,
+  rescheduleBookingCore,
+  type ActionResult,
+} from "@/lib/booking-mutations";
 
-export type ActionResult<T = unknown> =
-  | { ok: true; data: T }
-  | { ok: false; error: string };
+export type { ActionResult };
 
 type CreateInput = {
   date: string;
@@ -127,52 +125,30 @@ export async function createBooking(
   void sendBookingCreated(payload);
 
   revalidatePath("/");
+  revalidatePath("/admin");
   return { ok: true, data: { id, token } };
+}
+
+async function verifyToken(id: string, token: string): Promise<boolean> {
+  if (!id || !token) return false;
+  const client = await db();
+  const res = await client.execute({
+    sql: `SELECT cancel_token, cancelled_at FROM bookings WHERE id = ? LIMIT 1`,
+    args: [id],
+  });
+  if (res.rows.length === 0) return false;
+  const row = res.rows[0] as Record<string, unknown>;
+  if (row.cancelled_at) return false;
+  return row.cancel_token === token;
 }
 
 export async function cancelBooking(
   id: string,
   token: string,
 ): Promise<ActionResult<{ id: string }>> {
-  if (!id || !token) return { ok: false, error: "Missing booking details." };
-  const client = await db();
-
-  const before = await client.execute({
-    sql: `SELECT id, name, email, phone, slot_date, slot_hour, duration_hours, cancel_token, cancelled_at
-          FROM bookings
-          WHERE id = ? LIMIT 1`,
-    args: [id],
-  });
-  if (before.rows.length === 0)
+  if (!(await verifyToken(id, token)))
     return { ok: false, error: "Booking not found or already cancelled." };
-  const row = before.rows[0] as Record<string, unknown>;
-  if (row.cancel_token !== token || row.cancelled_at)
-    return { ok: false, error: "Booking not found or already cancelled." };
-
-  const now = new Date().toISOString();
-  const res = await client.execute({
-    sql: `UPDATE bookings
-          SET cancelled_at = ?
-          WHERE id = ? AND cancel_token = ? AND cancelled_at IS NULL`,
-    args: [now, id, token],
-  });
-  if (res.rowsAffected === 0)
-    return { ok: false, error: "Booking not found or already cancelled." };
-
-  void sendBookingCancelled({
-    id,
-    token,
-    name: String(row.name),
-    email: String(row.email),
-    phone: (row.phone as string) ?? null,
-    date: String(row.slot_date),
-    hour: Number(row.slot_hour),
-    duration: Number(row.duration_hours ?? 1),
-  });
-
-  revalidatePath("/");
-  revalidatePath(`/b/${id}`);
-  return { ok: true, data: { id } };
+  return cancelBookingCore(id);
 }
 
 type RescheduleInput = {
@@ -187,99 +163,7 @@ export async function rescheduleBooking(
   input: RescheduleInput,
 ): Promise<ActionResult<{ id: string }>> {
   const { id, token, newDate, newHour, newDuration } = input;
-  if (!id || !token) return { ok: false, error: "Missing booking details." };
-  if (!parseDateISO(newDate)) return { ok: false, error: "Invalid date." };
-  if (!isValidSlotHour(newHour))
-    return { ok: false, error: "Invalid time slot." };
-  if (!isValidDuration(newDuration))
-    return { ok: false, error: "Invalid duration." };
-  if (!fitsBeforeClose(newHour, newDuration))
-    return { ok: false, error: "That duration runs past closing time." };
-  if (isSlotInPast(newDate, newHour))
-    return { ok: false, error: "That slot has already passed." };
-  if (daysFromNow(newDate) > MAX_DAYS_AHEAD)
-    return {
-      ok: false,
-      error: `Bookings open up to ${MAX_DAYS_AHEAD} days in advance.`,
-    };
-
-  const client = await db();
-
-  const before = await client.execute({
-    sql: `SELECT id, name, email, phone, slot_date, slot_hour, duration_hours, cancel_token, cancelled_at
-          FROM bookings
-          WHERE id = ? LIMIT 1`,
-    args: [id],
-  });
-  if (before.rows.length === 0)
+  if (!(await verifyToken(id, token)))
     return { ok: false, error: "Booking not found or already cancelled." };
-  const row = before.rows[0] as Record<string, unknown>;
-  if (row.cancel_token !== token || row.cancelled_at)
-    return { ok: false, error: "Booking not found or already cancelled." };
-
-  const previous = {
-    date: String(row.slot_date),
-    hour: Number(row.slot_hour),
-    duration: Number(row.duration_hours ?? 1),
-  };
-
-  const newEnd = newHour + newDuration;
-  const tx = await client.transaction("write");
-  try {
-    const conflict = await tx.execute({
-      sql: `SELECT id FROM bookings
-            WHERE court = ?
-              AND slot_date = ?
-              AND cancelled_at IS NULL
-              AND id != ?
-              AND slot_hour < ?
-              AND slot_hour + duration_hours > ?
-            LIMIT 1`,
-      args: [COURT, newDate, id, newEnd, newHour],
-    });
-    if (conflict.rows.length > 0) {
-      await tx.rollback();
-      return {
-        ok: false,
-        error: "That time overlaps another booking. Please pick another.",
-      };
-    }
-    const res = await tx.execute({
-      sql: `UPDATE bookings
-            SET slot_date = ?, slot_hour = ?, duration_hours = ?
-            WHERE id = ? AND cancel_token = ? AND cancelled_at IS NULL`,
-      args: [newDate, newHour, newDuration, id, token],
-    });
-    if (res.rowsAffected === 0) {
-      await tx.rollback();
-      return { ok: false, error: "Booking not found or already cancelled." };
-    }
-    await tx.commit();
-  } catch (e) {
-    try {
-      await tx.rollback();
-    } catch {
-      // already rolled back
-    }
-    console.error("[rescheduleBooking] failed", e);
-    return { ok: false, error: "Could not reschedule. Please try again." };
-  }
-
-  void sendBookingRescheduled(
-    {
-      id,
-      token,
-      name: String(row.name),
-      email: String(row.email),
-      phone: (row.phone as string) ?? null,
-      date: newDate,
-      hour: newHour,
-      duration: newDuration,
-    },
-    previous,
-  );
-
-  revalidatePath("/");
-  revalidatePath(`/b/${id}`);
-  return { ok: true, data: { id } };
+  return rescheduleBookingCore({ id, newDate, newHour, newDuration });
 }
