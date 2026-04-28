@@ -3,15 +3,21 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { format, parse } from "date-fns";
-import { readMyBookings, type SavedBooking } from "@/lib/local-bookings";
+import {
+  readMyBookings,
+  removeMyBooking,
+  type SavedBooking,
+} from "@/lib/local-bookings";
 import { formatHourRange } from "@/lib/slots";
+import { verifyMyBookings } from "@/app/actions";
 
 export function MyBookings() {
   const [items, setItems] = useState<SavedBooking[]>([]);
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
-    function refresh() {
+    let cancelled = false;
+    async function refresh() {
       const all = readMyBookings();
       const today = format(new Date(), "yyyy-MM-dd");
       const upcoming = all
@@ -19,15 +25,45 @@ export function MyBookings() {
         .sort((a, b) =>
           a.date === b.date ? a.hour - b.hour : a.date < b.date ? -1 : 1,
         );
-      setItems(upcoming);
-      setHydrated(true);
+
+      if (upcoming.length === 0) {
+        if (!cancelled) {
+          setItems([]);
+          setHydrated(true);
+        }
+        return;
+      }
+
+      if (!cancelled) {
+        setItems(upcoming);
+        setHydrated(true);
+      }
+
+      try {
+        const { validIds } = await verifyMyBookings(
+          upcoming.map((b) => ({ id: b.id, token: b.token })),
+        );
+        if (cancelled) return;
+        const validSet = new Set(validIds);
+        const stale = upcoming.filter((b) => !validSet.has(b.id));
+        if (stale.length > 0) {
+          for (const s of stale) removeMyBooking(s.id);
+          setItems(upcoming.filter((b) => validSet.has(b.id)));
+        }
+      } catch {
+        // keep optimistic list on error
+      }
     }
-    refresh();
-    window.addEventListener("nook:bookings:changed", refresh);
-    window.addEventListener("storage", refresh);
+    void refresh();
+    const onChange = () => {
+      void refresh();
+    };
+    window.addEventListener("nook:bookings:changed", onChange);
+    window.addEventListener("storage", onChange);
     return () => {
-      window.removeEventListener("nook:bookings:changed", refresh);
-      window.removeEventListener("storage", refresh);
+      cancelled = true;
+      window.removeEventListener("nook:bookings:changed", onChange);
+      window.removeEventListener("storage", onChange);
     };
   }, []);
 

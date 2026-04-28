@@ -159,6 +159,29 @@ type RescheduleInput = {
   newDuration: number;
 };
 
+export async function verifyMyBookings(
+  items: { id: string; token: string }[],
+): Promise<{ validIds: string[] }> {
+  if (!items || items.length === 0) return { validIds: [] };
+  const ids = items.map((i) => i.id).filter(Boolean);
+  if (ids.length === 0) return { validIds: [] };
+  const client = await db();
+  const placeholders = ids.map(() => "?").join(",");
+  const res = await client.execute({
+    sql: `SELECT id, cancel_token FROM bookings
+          WHERE id IN (${placeholders}) AND cancelled_at IS NULL`,
+    args: ids,
+  });
+  const tokenById = new Map<string, string>();
+  for (const row of res.rows as Record<string, unknown>[]) {
+    tokenById.set(String(row.id), String(row.cancel_token));
+  }
+  const validIds = items
+    .filter((i) => tokenById.get(i.id) === i.token)
+    .map((i) => i.id);
+  return { validIds };
+}
+
 export async function rescheduleBooking(
   input: RescheduleInput,
 ): Promise<ActionResult<{ id: string }>> {
